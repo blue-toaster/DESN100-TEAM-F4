@@ -1,21 +1,8 @@
-#include <Arduino.h>
+#include "motor_tests/motor_test1.hpp"
 
-// define pins
-const int motor_l_speed_pin = 0;
-const int motor_r_speed_pin = 0;
-const int motor_l_forward_pin = 0;
-const int motor_l_reverse_pin = 0;
-const int motor_r_forward_pin = 0;
-const int motor_r_reverse_pin = 0;
 
-// define motor state
-bool motor_l_speed = 0;
-bool motor_r_speed = 0;
-bool motor_l_dir = 0;
-bool motor_r_dir = 0;
-uint8_t loop_tracker = 0b0;
 
-void setup() {
+void motorTest::init() {
     // setup pin modes
     pinMode(motor_l_speed_pin, OUTPUT);
     pinMode(motor_r_speed_pin, OUTPUT);
@@ -26,7 +13,7 @@ void setup() {
     
 }
 
-void loop() {
+void motorTest::run() {
     // loop motors spinning in all directions
 
     loop_tracker = (loop_tracker + 1) % 16;
