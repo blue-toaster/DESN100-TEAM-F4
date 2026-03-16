@@ -1,27 +1,12 @@
-#include <Arduino.h>
+#include "ultrasound_tests/ultrasound_test1.hpp"
 
-// pin definitons
-const int ultrasonic_trigger_pin = 0;
-const int ultrasonic_echo_pin = 0;
-const int buzzer_pin = 0;
-
-// constants
-const float ultrasonic_multi_factor = 0.01723;
-const int distance_thr = 20;
-const int ultrasonic_range[2] = {2, 400};
-const int buzzer_range[2] = {1, 5};
-
-// function prototyping
-long readUltrasonic(const int trig, const int echo);
-
-void setup() {
+void ultrasonicTest::init() {
     pinMode(ultrasonic_trigger_pin, OUTPUT);
     pinMode(ultrasonic_echo_pin, INPUT);
     pinMode(buzzer_pin, OUTPUT);
 }
 
-void loop() {
-
+void ultrasonicTest::run() {
     long distance = readUltrasonic(ultrasonic_trigger_pin, ultrasonic_echo_pin);
 
     if (distance > 30 && distance < 200) {
@@ -32,7 +17,7 @@ void loop() {
     }
 }
 
-long readUltrasonic(const int trig, const int echo) {
+long ultrasonicTest::readUltrasonic(const int trig, const int echo) {
     // set trig 0
     digitalWrite(trig, LOW);
 
