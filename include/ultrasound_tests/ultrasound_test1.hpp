@@ -1,3 +1,6 @@
+#ifndef ULTRASONIC_TEST_H
+#define ULTRASONIC_TEST_H
+
 #include "interfaces.hpp"
 
 class ultrasonicTest : modesObject 
@@ -21,3 +24,5 @@ private:
     const int buzzer_range[2] = {1, 5};
 
 };
+
+#endif

@@ -1,3 +1,6 @@
+#ifndef MOTOR_TEST_H
+#define MOTOR_TEST_H
+
 #include "interfaces.hpp"
 
 class motorTest : modesObject 
@@ -23,3 +26,5 @@ private:
     uint8_t loop_tracker = 0b0;
 
 };
+
+#endif

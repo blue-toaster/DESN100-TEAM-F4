@@ -39,3 +39,17 @@ modesEnum run_mode = modesEnum::MOTORS;
 //                                 |
 //                        (change this guy above)
 ```
+
+Each mode inherents both run and init from the modesObject class, since all arduino code runs on void setup() and void loop().
+
+In main void setup() is used to run the init function for the selected mode then void loop() is used to constantly run the run() function for the selected mode.
+
+The source code for each mode is placed in folders as shown below:
+- ULTRASONIC -> ultrasound_tests
+- MOTORS -> motor_drive_tests
+- PIXYCAM -> pixy_cam_calibration
+- IRSENSOR -> (undefined as of 18/03/2026)
+- COMPLIANCE -> compliance_testing
+- MAIN -> mike_waste_outski
+
+Their respective header files for object definition are placed within the include directory

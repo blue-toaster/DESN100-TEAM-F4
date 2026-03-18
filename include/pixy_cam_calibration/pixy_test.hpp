@@ -1,3 +1,6 @@
+#ifndef PIXY_TEST_H
+#define PIXY_TEST_H
+
 #include "interfaces.hpp"
 
 class pixyTest : modesObject 
@@ -9,3 +12,5 @@ public:
 private:
     Pixy2 pixy;
 };
+
+#endif

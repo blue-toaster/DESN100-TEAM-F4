@@ -1,3 +1,6 @@
+#ifndef INTERFACES_H
+#define INTERFACES_H
+
 #include <Arduino.h>
 #include <Pixy2.h>
 
@@ -19,3 +22,5 @@ public:
 
     virtual void init() = 0;
 };
+
+#endif
