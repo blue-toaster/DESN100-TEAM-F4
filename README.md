@@ -33,5 +33,9 @@ The code runs off of a few different modes
 Before uploading code change 'run_mode' to the desired operation mode (like below):
 
 ```cpp
+// Variable to define operation mode
 modesEnum run_mode = modesEnum::MOTORS;
+//                                 ^
+//                                 |
+//                        (change this guy above)
 ```
