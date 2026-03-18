@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Pixy2.h>
 
 #pragma once
 
