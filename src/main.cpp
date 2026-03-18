@@ -1,5 +1,6 @@
 #include "ultrasound_tests/ultrasound_test1.hpp"
 #include "motor_tests/motor_test1.hpp"
+#include "pixy_cam_calibration/pixy_test.hpp"
 #include "interfaces.hpp"
 
 // Mode enum definition
@@ -8,6 +9,7 @@ modesEnum run_mode = modesEnum::MOTORS;
 // Run modes definitions
 ultrasonicTest ult_test;
 motorTest motor_test;
+pixyTest pixy_test;
 
 void setup() {
   // put your setup code here, to run once:
@@ -21,7 +23,7 @@ void setup() {
       break;
 
     case modesEnum::PIXYCAM:
-      // to be coded
+      pixy_test.init();
       break;
 
     case modesEnum::IRSENSOR:
@@ -50,7 +52,7 @@ void loop() {
       break;
 
     case modesEnum::PIXYCAM:
-      // to be coded
+      pixy_test.run();
       break;
 
     case modesEnum::IRSENSOR:
