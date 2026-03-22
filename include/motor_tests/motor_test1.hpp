@@ -13,10 +13,8 @@ private:
     // define pins
     const int motor_l_speed_pin = 0;
     const int motor_r_speed_pin = 0;
-    const int motor_l_forward_pin = 0;
-    const int motor_l_reverse_pin = 0;
-    const int motor_r_forward_pin = 0;
-    const int motor_r_reverse_pin = 0;
+    const int motor_l_direction_pin = 0;
+    const int motor_r_direction_pin = 0;
 
     // define motor state
     bool motor_l_speed = 0;

@@ -6,10 +6,8 @@ void motorTest::init() {
     // setup pin modes
     pinMode(motor_l_speed_pin, OUTPUT);
     pinMode(motor_r_speed_pin, OUTPUT);
-    pinMode(motor_l_forward_pin, INPUT);
-    pinMode(motor_l_reverse_pin, INPUT);
-    pinMode(motor_r_forward_pin, INPUT);
-    pinMode(motor_r_reverse_pin, INPUT);
+    pinMode(motor_l_direction_pin, INPUT);
+    pinMode(motor_r_direction_pin, INPUT);
     
 }
 
@@ -23,10 +21,8 @@ void motorTest::run() {
     motor_r_dir = (loop_tracker >> 3) & 0b1;
 
     // set motor values
-    digitalWrite(motor_l_forward_pin, motor_l_dir);
-    digitalWrite(motor_l_reverse_pin, !motor_l_dir);
-    digitalWrite(motor_r_forward_pin, motor_l_dir);
-    digitalWrite(motor_r_reverse_pin, !motor_l_dir);
+    digitalWrite(motor_l_direction_pin, motor_l_dir);
+    digitalWrite(motor_r_direction_pin, motor_l_dir);
 
     analogWrite(motor_l_speed_pin, 255 * motor_l_speed);
     analogWrite(motor_r_speed_pin, 255 * motor_r_speed);
