@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include <Pixy2.h>
+#include <math.h>
 
 #pragma once
 
