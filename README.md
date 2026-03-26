@@ -6,6 +6,10 @@ If ur not part of the team please don't copy our code like that's just kinda mea
 
 yo eason u can checkout some of the code and take a look and how stuff works. Ill help u get set up on platformio
 
+# IMPORTANT
+
+ALL UNITS ARE IN mm!!!!
+
 ## How to upload to arduino
 
 Install vscode if not already installed

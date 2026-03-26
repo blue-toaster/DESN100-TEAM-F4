@@ -57,8 +57,132 @@ void complianceTesting::init() {
 
     // pixycam init
     pixy.init();
+
+    // PD controller init
+    controller.setCoefficients(K_p, K_d);
 }
 
 void complianceTesting::run() {
+    // get blocks in frame
+    pixy.ccc.getBlocks();
 
+    if (target_index) {
+        w_cur = pixy.ccc.blocks[target_index].m_width;
+        h_cur = pixy.ccc.blocks[target_index].m_height;
+    }
+
+    long obsticle_detection = readUltrasonic(ultrasonic_trigger_pin, ultrasonic_echo_pin);
+
+    if (obsticle_detection < ultrasonic_obsticle_thr) {
+        analogWrite(motor_l_speed_pin, 0);
+        analogWrite(motor_r_speed_pin, 0);
+        return;
+    }
+
+    switch (bot_state) {
+        case BotState::DRONE_COL:
+            performDrone();
+        case BotState::COL_NAV:
+            navigateCol();
+        case BotState::COL_GRAB:
+            delay(100);
+            bot_state = BotState::DRONE_DEP;
+            target_colour = BASE;
+        case BotState::DRONE_DEP:
+            performDrone();
+        case BotState::DEP_NAV:
+            navigateDep();
+        case BotState::DEP_DROP:
+            delay(100);
+            bot_state = BotState::DRONE_COL;
+            target_colour = 0;
+        default:
+            delay(100);
+    }
+
+    if (target_index) {
+        age_prev = pixy.ccc.blocks[target_index].m_age;
+        w_cur = pixy.ccc.blocks[target_index].m_width;
+        h_prev = pixy.ccc.blocks[target_index].m_height;
+    }
+}
+
+void complianceTesting::performDrone() {
+    setMotors((300 / axle_length));
+
+    // check for blocks in frame
+    if (pixy.ccc.numBlocks) {
+        for (int i = 0; i < pixy.ccc.numBlocks; i++) {
+            if (pixy.ccc.blocks[i].m_signature == target_colour) {
+                target_index = pixy.ccc.blocks[i].m_index;
+                bot_state = BotState::COL_NAV;
+                break;
+            }
+        }
+    }
+}
+
+void complianceTesting::navigateCol() {
+    float delta_scale = (w_cur * h_cur) / (w_prev * h_prev);
+    delta_scale = abs(1 - delta_scale);
+
+    if (
+        delta_scale > bounding_box_thr && 
+        abs(pixy.ccc.blocks[target_index].m_age - age_prev) > age_thr &&
+        target_colour != pixy.ccc.blocks[target_index].m_signature
+    ) {
+        // lost targeting block
+        bot_state = BotState::DRONE_COL;
+        return;
+    }
+    
+    // target object close enough?
+    if (
+        (pixy.ccc.blocks[target_index].m_y + (pixy.ccc.blocks[target_index].m_height / 2)) > y_closeness_thr && 
+        pixy.ccc.blocks[target_index].m_age > age_thr
+    ) {
+        setMotors(0);
+        delay((100 / (5 * PI * wheel_radius)) * 1000);
+        analogWrite(motor_l_speed_pin, 0);
+        analogWrite(motor_r_speed_pin, 0);
+        delay(500);
+        bot_state = BotState::COL_GRAB;
+    }
+
+    // get optimal rotation speed
+    target_rotation_speed = controller.updatePD((long)(pixy.ccc.blocks[target_index].m_x - 157.5));
+
+    // set motors
+    setMotors(target_rotation_speed);
+}
+
+void complianceTesting::navigateDep() {
+    float delta_scale = (w_cur * h_cur) / (w_prev * h_prev);
+    delta_scale = abs(1 - delta_scale);
+
+    if (
+        delta_scale > bounding_box_thr && 
+        abs(pixy.ccc.blocks[target_index].m_age - age_prev) > age_thr &&
+        target_colour != pixy.ccc.blocks[target_index].m_signature
+    ) {
+        // lost targeting block
+        bot_state = BotState::DRONE_COL;
+        return;
+    }
+    
+    // is base close enough
+    if (
+        (w_cur * h_cur) > base_size_thr && 
+        pixy.ccc.blocks[target_index].m_age > age_thr
+    ) {
+        setMotors(0);
+        analogWrite(motor_l_speed_pin, 0);
+        analogWrite(motor_r_speed_pin, 0);
+        delay(500);
+        bot_state = BotState::DEP_DROP;
+    }
+
+    target_rotation_speed = controller.updatePD((long)(pixy.ccc.blocks[target_index].m_x - 157.5));
+
+    setMotors(target_rotation_speed);
 }
