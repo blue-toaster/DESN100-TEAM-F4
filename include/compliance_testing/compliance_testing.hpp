@@ -28,7 +28,9 @@ public:
 
     // utility
     long readUltrasonic(const int trig, const int ehco);
-    void setMotors(long v_theta);
+    void setMotors(double v_theta);
+    Block getDetection(uint16_t index);
+    bool checkBlock(Block block);
 
     // core functionality
     void performDrone();
@@ -41,10 +43,10 @@ private:
     // pin definitions
 
     // motors
-    const int motor_l_speed_pin = 0;
-    const int motor_r_speed_pin = 0;
-    const int motor_l_direction_pin = 0;
-    const int motor_r_direction_pin = 0;
+    const int motor_l_speed_pin = 5;
+    const int motor_r_speed_pin = 6;
+    const int motor_l_direction_pin = 4;
+    const int motor_r_direction_pin = 7;
 
     // utlrasonic
     const int ultrasonic_trigger_pin = 0;
@@ -55,30 +57,30 @@ private:
     Pixy2 pixy;
 
     // constants
-    const float ultrasonic_multi_factor = 0.01723;
+    const double ultrasonic_multi_factor = 0.01723;
     const int distance_thr = 20;
     const int ultrasonic_range[2] = {2, 400};
     const int buzzer_range[2] = {1, 5};
-    const long max_RPM = 150;
-    const long wheel_radius = 0;
-    const long axle_length = 0;
-    const long axle_radius = 0;
-    const float bounding_box_thr = 0.2;
+    const double max_RPM = 150;
+    const double wheel_radius = 3.5;
+    const double axle_length = 16.5;
+    double axle_radius = 0;
+    const double bounding_box_thr = 0.2;
     const uint16_t age_thr = 60;
-    const float ultrasonic_obsticle_thr = 6;
+    const double ultrasonic_obsticle_thr = 6;
     const uint16_t base_sig = 5;
-    const uint16_t y_closeness_thr = 200;
+    const uint16_t y_closeness_thr = 180;
     const uint16_t base_size_thr = 1000;
 
     // PD controller
     PDController controller;
-    const long K_p = -1;
-    const long K_d = -0.5;
+    const double K_p = -0.77;
+    const double K_d = 3.5;
 
     // motor Movement Variables
-    long wheel_R_speed = 0;
-    long wheel_L_speed = 0;
-    long target_rotation_speed = 0;
+    double wheel_R_speed = 0;
+    double wheel_L_speed = 0;
+    double target_rotation_speed = 0;
     bool R_dir = 0;
     bool L_dir = 0;
 
@@ -93,6 +95,8 @@ private:
     uint16_t w_cur;
     uint16_t h_cur;
     uint16_t age_prev;
+
+    Block target_block;
 
 };
 

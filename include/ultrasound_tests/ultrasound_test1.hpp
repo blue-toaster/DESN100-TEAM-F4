@@ -13,8 +13,8 @@ public:
 
 private:
     // pin definitons
-    const int ultrasonic_trigger_pin = 0;
-    const int ultrasonic_echo_pin = 0;
+    const int ultrasonic_trigger_pin = 8;
+    const int ultrasonic_echo_pin = 2;
     const int buzzer_pin = 0;
 
     // constants

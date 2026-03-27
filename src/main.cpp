@@ -1,15 +1,17 @@
 #include "ultrasound_tests/ultrasound_test1.hpp"
 #include "motor_tests/motor_test1.hpp"
 #include "pixy_cam_calibration/pixy_test.hpp"
+#include "compliance_testing/compliance_testing.hpp"
 #include "interfaces.hpp"
 
 // Mode enum definition
-modesEnum run_mode = modesEnum::MOTORS;
+modesEnum run_mode = modesEnum::COMPLIANCE;
 
 // Run modes definitions
 ultrasonicTest ult_test;
 motorTest motor_test;
 pixyTest pixy_test;
+complianceTesting compliance_test;
 
 void setup() {
   // put your setup code here, to run once:
@@ -31,7 +33,7 @@ void setup() {
       break;
 
     case modesEnum::COMPLIANCE:
-      // to be coded
+      compliance_test.init();
       break;
 
     case modesEnum::MAIN:
@@ -60,7 +62,7 @@ void loop() {
       break;
 
     case modesEnum::COMPLIANCE:
-      // to be coded
+      compliance_test.run();
       break;
 
     case modesEnum::MAIN:

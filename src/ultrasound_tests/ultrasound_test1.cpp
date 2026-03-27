@@ -4,17 +4,15 @@ void ultrasonicTest::init() {
     pinMode(ultrasonic_trigger_pin, OUTPUT);
     pinMode(ultrasonic_echo_pin, INPUT);
     pinMode(buzzer_pin, OUTPUT);
+    Serial.begin(9000);
 }
 
 void ultrasonicTest::run() {
     long distance = readUltrasonic(ultrasonic_trigger_pin, ultrasonic_echo_pin);
 
-    if (distance > 30 && distance < 200) {
-        long freq = map(distance, ultrasonic_range[0], ultrasonic_range[1], buzzer_range[0], buzzer_range[1]);
-        tone(buzzer_pin, (int)freq);
-    } else {
-        noTone(buzzer_pin);
-    }
+    Serial.print("Detected: ");
+    Serial.print(distance);
+    Serial.print("\n");
 }
 
 long ultrasonicTest::readUltrasonic(const int trig, const int echo) {
