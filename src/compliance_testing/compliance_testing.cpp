@@ -13,7 +13,7 @@ long complianceTesting::readUltrasonic(const int trig, const int echo) {
     return (ultrasonic_multi_factor * pulseIn(echo, HIGH));
 }
 
-void complianceTesting::setMotors(double v_theta) {
+void complianceTesting::setMotors(double v_theta, int move) {
 
     axle_radius = axle_length / 2;
 
@@ -22,10 +22,11 @@ void complianceTesting::setMotors(double v_theta) {
     L_dir = 0;
 
     // get maximum forward speed for given angular velocity
-    long v_f = ((max_RPM / 60) * 2 * PI * wheel_radius) - (abs(v_theta) * axle_radius);
+    double v_f = 0.45 * ((max_RPM / 60) * 2 * PI * wheel_radius) - (abs(v_theta) * axle_radius);
+    
+    v_f = v_f * move;
 
     // debug turning
-    v_f = 0;
 
     // set wheel speeds
     wheel_L_speed = ((v_f - v_theta * axle_radius) * 60) / (2 * PI * wheel_radius);
@@ -88,13 +89,23 @@ void complianceTesting::run() {
         Serial.print("\n");
     }
 
-    // long obsticle_detection = readUltrasonic(ultrasonic_trigger_pin, ultrasonic_echo_pin);
+    long obsticle_detection = readUltrasonic(ultrasonic_trigger_pin, ultrasonic_echo_pin);
 
-    // if (obsticle_detection < ultrasonic_obsticle_thr) {
-    //     analogWrite(motor_l_speed_pin, 0);
-    //     analogWrite(motor_r_speed_pin, 0);
-    //     return;
-    // }
+    if (obsticle_detection < ultrasonic_obsticle_thr) {
+        Serial.print(obsticle_detection);
+        Serial.print("\n");
+        analogWrite(motor_l_speed_pin, 0);
+        analogWrite(motor_r_speed_pin, 0);
+        delay(500);
+        analogWrite(motor_l_speed_pin, 150);
+        analogWrite(motor_r_speed_pin, 150);
+        digitalWrite(motor_l_direction_pin, 1);
+        digitalWrite(motor_r_direction_pin, 1);
+        delay(300);
+        analogWrite(motor_l_speed_pin, 0);
+        analogWrite(motor_r_speed_pin, 0);
+        return;
+    }
 
     switch (bot_state) {
         case BotState::DRONE_COL:
@@ -104,7 +115,7 @@ void complianceTesting::run() {
             navigateCol();
             break;
         case BotState::COL_GRAB:
-            delay(100);
+            delay(1000);
             bot_state = BotState::DRONE_DEP;
             target_colour = BASE;
             break;
@@ -112,12 +123,15 @@ void complianceTesting::run() {
             performDrone();
             break;
         case BotState::DEP_NAV:
+            Serial.print("\n\n\n\n\n\n\n\n\n\n");
             navigateDep();
             break;
         case BotState::DEP_DROP:
-            delay(100);
+            delay(1000);
+            Serial.print("FOUND BASE\n\n\n\n\n\n\n\n\n\n");
             bot_state = BotState::DRONE_COL;
-            target_colour = 0;
+            colour_counter = (colour_counter + 1) % 3;
+            target_colour = ball_colours[colour_counter];
             break;
         default:
             delay(100);
@@ -126,14 +140,14 @@ void complianceTesting::run() {
 
     if (target_index) {
         age_prev = target_block.m_age;
-        w_cur = target_block.m_width;
+        w_prev = target_block.m_width;
         h_prev = target_block.m_height;
     }
 }
 
 void complianceTesting::performDrone() {
     Serial.print("Scanning zone\n");
-    setMotors(0);
+    setMotors(1.5, 0);
 
     // check for blocks in frame
     if (pixy.ccc.numBlocks) {
@@ -147,7 +161,12 @@ void complianceTesting::performDrone() {
                 target_index = pixy.ccc.blocks[i].m_index;
                 w_cur = pixy.ccc.blocks[i].m_width;
                 h_cur = pixy.ccc.blocks[i].m_height;
-                bot_state = BotState::COL_NAV;
+                if (bot_state == BotState::DRONE_COL) {
+                    bot_state = BotState::COL_NAV;
+                } else if(bot_state == BotState::DRONE_DEP) {
+                    Serial.print("llllll\n\n\n\n\n\n\n\n\n\n");
+                    bot_state = BotState::DEP_NAV;
+                }
                 Serial.print("Found object\n");
                 break;
             }
@@ -177,8 +196,8 @@ void complianceTesting::navigateCol() {
     ) {
         Serial.print("Object is close enough\n");
         Serial.print((target_block.m_y - (uint16_t)((target_block.m_height / 2))));
-        setMotors(0);
-        delay((100 / (5 * PI * wheel_radius)) * 1000);
+        setMotors(0, 1);
+        delay(700);
         analogWrite(motor_l_speed_pin, 0);
         analogWrite(motor_r_speed_pin, 0);
         delay(500);
@@ -192,45 +211,48 @@ void complianceTesting::navigateCol() {
     Serial.print("\n");
 
     // get optimal rotation speed
-    target_rotation_speed = controller.updatePD(x_pos - 157);
+    target_rotation_speed = controller.updatePD(x_pos);
 
     Serial.print("\tRequested rotation speed: ");
     Serial.print(target_rotation_speed);
     Serial.print("\n");
 
     // set motors
-    setMotors(target_rotation_speed);
+    setMotors(target_rotation_speed, 1);
 }
 
 void complianceTesting::navigateDep() {
-    double delta_scale = (w_cur * h_cur) / (w_prev * h_prev);
-    delta_scale = abs(1 - delta_scale);
-
-    if (
-        delta_scale > bounding_box_thr && 
-        abs(pixy.ccc.blocks[target_index].m_age - age_prev) > age_thr &&
-        target_colour != pixy.ccc.blocks[target_index].m_signature
-    ) {
+    
+    if (!checkBlock(target_block)) {
         // lost targeting block
-        bot_state = BotState::DRONE_COL;
+        Serial.print("Lost block\n");
+        bot_state = BotState::DRONE_DEP;
+        target_index = 0;
         return;
     }
-    
-    // is base close enough
+
+    // target object close enough?
     if (
-        (w_cur * h_cur) > base_size_thr && 
-        pixy.ccc.blocks[target_index].m_age > age_thr
+        (target_block.m_height * target_block.m_width) > base_size_thr && 
+        target_block.m_age > age_thr
     ) {
-        setMotors(0);
+        Serial.print("Object is close enough\n");
+        Serial.print((target_block.m_y - (uint16_t)((target_block.m_height / 2))));
+        setMotors(0, 1);
+        delay(700);
         analogWrite(motor_l_speed_pin, 0);
         analogWrite(motor_r_speed_pin, 0);
         delay(500);
         bot_state = BotState::DEP_DROP;
     }
 
-    target_rotation_speed = controller.updatePD((double)(pixy.ccc.blocks[target_index].m_x - 157));
+    int x_pos = target_block.m_x;
 
-    setMotors(target_rotation_speed);
+    // get optimal rotation speed
+    target_rotation_speed = controller.updatePD(x_pos);
+
+    // set motors
+    setMotors(target_rotation_speed, 1);
 }
 
 Block complianceTesting::getDetection(uint16_t index) {

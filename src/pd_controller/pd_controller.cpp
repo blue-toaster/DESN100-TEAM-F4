@@ -5,10 +5,17 @@ void PDController::setCoefficients(double p, double d) {
     K_p = p;
 }
 
-double PDController::updatePD(double err) {
-    double output = ((K_p * err) + (K_d * ((err - e_prev) * dt))) / 50;
+double PDController::updatePD(double pos) {
 
-    e_prev = err;
+    double sp = 157;
+
+    double err = pos - sp;
+
+
+
+    double output = ((K_p * err) + (K_d * (-1 * (pos - e_prev) / dt))) / 50;
+
+    e_prev = pos;
 
     Serial.print("\tCalculated Rotation: ");
     Serial.print(output);

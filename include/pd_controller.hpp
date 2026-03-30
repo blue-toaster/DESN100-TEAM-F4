@@ -8,7 +8,9 @@ class PDController
 public:
     void setCoefficients(double p, double d);
 
-    double updatePD(double err);
+    double updatePD(double pos);
+
+    double e_prev = 0;
 
 private:
     // Control coefficients
@@ -16,7 +18,6 @@ private:
     double K_d = 0;
 
     // Error Variables
-    double e_prev = 0;
 
     // Constants
     const double dt = (1.0 / 60.0);

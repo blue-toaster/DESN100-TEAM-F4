@@ -28,7 +28,7 @@ public:
 
     // utility
     long readUltrasonic(const int trig, const int ehco);
-    void setMotors(double v_theta);
+    void setMotors(double v_theta, int move);
     Block getDetection(uint16_t index);
     bool checkBlock(Block block);
 
@@ -49,8 +49,8 @@ private:
     const int motor_r_direction_pin = 7;
 
     // utlrasonic
-    const int ultrasonic_trigger_pin = 0;
-    const int ultrasonic_echo_pin = 0;
+    const int ultrasonic_trigger_pin = 8;
+    const int ultrasonic_echo_pin = 2;
     const int buzzer_pin = 0;
 
     // pixycam
@@ -67,15 +67,18 @@ private:
     double axle_radius = 0;
     const double bounding_box_thr = 0.2;
     const uint16_t age_thr = 60;
-    const double ultrasonic_obsticle_thr = 6;
+    const double ultrasonic_obsticle_thr = 10;
     const uint16_t base_sig = 5;
-    const uint16_t y_closeness_thr = 180;
-    const uint16_t base_size_thr = 1000;
+    const uint16_t y_closeness_thr = 200;
+    const uint16_t base_size_thr = 400;
+    int ball_colours[3] = {RED, GREEN, BLUE};
+    int colour_counter = 0;
 
     // PD controller
     PDController controller;
-    const double K_p = -0.77;
-    const double K_d = 3.5;
+    // fresh battery
+    const double K_p = -0.75;
+    const double K_d = 0.008;
 
     // motor Movement Variables
     double wheel_R_speed = 0;
