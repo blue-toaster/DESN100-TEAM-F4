@@ -11,10 +11,10 @@ public:
 
 private:
     // define pins
-    const int motor_l_speed_pin = 5;
+    const int motor_l_speed_pin = 0;
     const int motor_r_speed_pin = 6;
     const int motor_l_direction_pin = 4;
-    const int motor_r_direction_pin = 7;
+    const int motor_r_direction_pin = 9s;
 
     // define motor state
     bool motor_l_speed = 0;

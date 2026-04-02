@@ -70,7 +70,7 @@ private:
     const double ultrasonic_obsticle_thr = 10;
     const uint16_t base_sig = 5;
     const uint16_t y_closeness_thr = 200;
-    const uint16_t base_size_thr = 400;
+    const uint16_t base_size_thr = 500;
     int ball_colours[3] = {RED, GREEN, BLUE};
     int colour_counter = 0;
 

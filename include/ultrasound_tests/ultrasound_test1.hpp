@@ -21,7 +21,7 @@ private:
     const float ultrasonic_multi_factor = 0.01723;
     const int distance_thr = 20;
     const int ultrasonic_range[2] = {2, 400};
-    const int buzzer_range[2] = {1, 5};
+    const int buzzer_range[2] = {1, 8};
 
 };
 
